@@ -108,15 +108,4 @@ To compute model performance, run the `kitti_eval` project:
 ./kitti_eval/evaluate_object_3d_offline [DATA_DIR]/validation/label_2 ./predictions [output file]
 ```
 
-## What's New
 
-- TensorFlow 2.0.0
-- Data pipeline with TensorFlow Dataset API
-- Eager execution (with use of autograph for speed)
-- Huber loss for regression
-- Use of `tf.distribute` for multi-GPU training (currently supports single GPU)
-- Excludes the first type of data augmentation (may impact performance)
-
-## Performances
-
-Training is ongoing. Preliminary tests include overfitting the model on a small dataset to ensure the model's learning capability. Further performance metrics will be added as training progresses.

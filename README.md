@@ -1,49 +1,73 @@
-Voxelnet (tensorflow 2.0.0)
-Image of Voxelnet Architecture
+Here is a structured `README.md` file based on the details you provided:
 
-Implementation of VoxelNet: End-to-End Learning for Point Cloud Based 3D Object Detection in tensorflow 2.0.0.
-This project is based on the work of Qiangui Huang, (project) and Xiaojian Ma. Thanks to them for their tremendous job that allowed me to rebuild this architecture and understand the non explicit parts of the paper.
+---
 
+# VoxelNet Implementation
 
-Dependencies
-Python 3.6
-Tensorflow 2.0.0
-opencv
-numba
-Installation
-Clone this repository
-Compile the Cython module
-$ python3 setup build_ext --inplace
-Compile the evaluation code (Optional) This will compile the Kitti_eval project which I decided not to run during the training (during the dump tests). But at the end, of the training, you may run this evaluation code with the model of your choice. In the training script, it is commented. You may un-comment to run the kitti_eval during the training.
-$ cd kitti_eval
-$ g++ -o evaluate_object_3d_offline evaluate_object_3d_offline.cpp
-grant the execution permission to evaluation script
-$ cd kitti_eval
-$ chmod +x launch_test.sh
-Data preparation
-Download the 3D KITTI detection dataset from here. Data to download include:
+This repository provides an implementation of **VoxelNet**: End-to-End Learning for Point Cloud Based 3D Object Detection using TensorFlow 2.0.0. This project is inspired by the work of Qiangui Huang and Xiaojian Ma. Thanks to them for their significant contributions, which have facilitated the reconstruction of this architecture and deepened the understanding of the non-explicit parts of the original paper.
 
-Velodyne point clouds (29 GB): input data to VoxelNet
-Training labels of object data set (5 MB): input label to VoxelNet
-Camera calibration matrices of object data set (16 MB): for visualization of predictions
-Left color images of object data set (12 GB): for visualization of predictions
-In this project, we use the cropped point cloud data for training and validation. Point clouds outside the image coordinates are removed. Update the directories in data/crop.py and run data/crop.py to generate cropped data. Note that cropped point cloud data will overwrite raw point cloud data.
+## Dependencies
 
-Split the training set into training and validation set according to the protocol here. And rearrange the folders to have the following structure:
+- Python 3.6
+- TensorFlow 2.0.0
+- OpenCV
+- Numba
 
-└── DATA_DIR
+## Installation
+
+1. **Clone this repository:**
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
+
+2. **Compile the Cython module:**
+   ```bash
+   python3 setup.py build_ext --inplace
+   ```
+
+3. **Compile the evaluation code (Optional):**
+   This step compiles the `Kitti_eval` project. Note that this is not required during training but can be used for evaluation after training.
+   ```bash
+   cd kitti_eval
+   g++ -o evaluate_object_3d_offline evaluate_object_3d_offline.cpp
+   ```
+
+4. **Grant execution permission to the evaluation script:**
+   ```bash
+   cd kitti_eval
+   chmod +x launch_test.sh
+   ```
+
+## Data Preparation
+
+1. Download the 3D KITTI detection dataset from [here](<dataset-url>). The following files are required:
+   - Velodyne point clouds (29 GB)
+   - Training labels of object data set (5 MB)
+   - Camera calibration matrices of object data set (16 MB)
+   - Left color images of object data set (12 GB)
+
+2. Prepare cropped point cloud data:
+   - Update the directories in `data/crop.py` and run the script to generate cropped data. Note that this will overwrite raw point cloud data.
+
+3. Split the dataset into training and validation sets according to the [protocol](<protocol-url>), and rearrange the folders to have the following structure:
+   ```
+   └── DATA_DIR
        ├── training   <-- training data
        |   ├── image_2
        |   ├── label_2
        |   └── velodyne
        └── validation  <--- evaluation data
-       |   ├── image_2
-       |   ├── label_2
-       |   └── velodyne
-Train
-Run train.py. You can find the meaning of each hyperparameter in the script file.
+           ├── image_2
+           ├── label_2
+           └── velodyne
+   ```
 
-$ !python train.py \
+## Training
+
+Run the training script with the following command:
+```bash
+python train.py \
 --strategy="all" \
 --n_epochs=160 \
 --batch_size=2 \
@@ -61,10 +85,14 @@ $ !python train.py \
 --summary_interval=10 \
 --summary_val_interval=10 \
 --summary_flush_interval=20 \
---ckpt_max_keep=10 \
-Evaluate
-Run predict.py.
-!python predict.py \
+--ckpt_max_keep=10
+```
+
+## Evaluation
+
+Run the prediction script with:
+```bash
+python predict.py \
 --strategy="all" \
 --batch_size=2 \
 --dump_vis="yes" \
@@ -72,23 +100,23 @@ Run predict.py.
 --dataset_to_test="validation" \
 --model_dir="model" \
 --model_name="model6" \
---ckpt_name="" \
-Then, run the kitty_eval project to compute the performances of the model.
+--ckpt_name=""
+```
+
+To compute model performance, run the `kitti_eval` project:
+```bash
 ./kitti_eval/evaluate_object_3d_offline [DATA_DIR]/validation/label_2 ./predictions [output file]
-What's new
-Tensorflow 2.0.0
-Data pipeline with tensorflow dataset api
-Eager mode (with use of autograph for speed)
-Use of a variant of the smooth-l1 loss for the regression loss (use of Huber loss)
-Use of tf.distribute for the multi gpu training (still in process, only one gpu training works for now)
-Non use of the first type of data augmentation (may lead in a decrease of performance)
-Performances
-(ongoing) I've just finished the project, and start training it. But before that, I did a lot of tests to challenge the archictecture. One of them is overfitting the model on a small training set in a few steps in order to check if i built a model able to learn anything at all, results, below.(PS : I tried to be faithful as much as I could to the paper).
+```
 
-perf perf2
+## What's New
 
-Coming next
-Train of models for car detection
-Finish multi gpu interface
-Train models for Pedestrian and Cyclist detection
-Try new features that I'll communicate soon
+- TensorFlow 2.0.0
+- Data pipeline with TensorFlow Dataset API
+- Eager execution (with use of autograph for speed)
+- Huber loss for regression
+- Use of `tf.distribute` for multi-GPU training (currently supports single GPU)
+- Excludes the first type of data augmentation (may impact performance)
+
+## Performances
+
+Training is ongoing. Preliminary tests include overfitting the model on a small dataset to ensure the model's learning capability. Further performance metrics will be added as training progresses.
